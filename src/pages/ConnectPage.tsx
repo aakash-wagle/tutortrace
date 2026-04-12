@@ -48,7 +48,16 @@ export default function ConnectPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: trimmed }),
       });
-      const data = await res.json();
+      let data: { error?: string; canvasUserId?: string; userId?: string; displayName?: string; avatarUrl?: string };
+      try {
+        data = await res.json();
+      } catch {
+        setError(
+          `Unexpected response from ${CANVAS_PROXY_BASE}. Is the proxy running? Try: npm run proxy:dev`
+        );
+        setLoading(false);
+        return;
+      }
       if (!res.ok) {
         setError(data.error || "Failed to connect. Please check your token.");
         setLoading(false);
@@ -60,8 +69,15 @@ export default function ConnectPage() {
       await unlockBadge("first_login");
       await logActivity("login");
       navigate("/today");
-    } catch {
-      setError("Connection failed. Please try again.");
+    } catch (e) {
+      const network =
+        e instanceof TypeError ||
+        (e instanceof Error && /failed to fetch|networkerror|load failed/i.test(e.message));
+      setError(
+        network
+          ? `Cannot reach Canvas proxy at ${CANVAS_PROXY_BASE}. In a separate terminal run: npm run proxy:dev`
+          : "Connection failed. Please try again."
+      );
       setLoading(false);
     }
   };

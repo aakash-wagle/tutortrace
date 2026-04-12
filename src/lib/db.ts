@@ -124,6 +124,34 @@ export interface DexieContentChunk {
   };
 }
 
+export interface DexieCustomCourse {
+  courseId: string;           // UUID primary key
+  courseName: string;
+  category: string;
+  level: string;              // "Beginner" | "Intermediate" | "Advanced"
+  courseOutput: {
+    category: string;
+    topic: string;
+    description: string;
+    level: string;
+    duration: string;
+    chapters: { chapter_name: string; description: string; duration: string }[];
+  };
+  isVideo: "Yes" | "No";
+  courseBanner?: string;      // data URL
+  isPublished: boolean;
+  createdAt: number;          // epoch ms
+  updatedAt: number;
+}
+
+export interface DexieCustomChapter {
+  courseId: string;           // compound primary key part 1
+  chapterId: number;          // compound primary key part 2
+  content: unknown;           // ChapterSection[]
+  videoId: string;            // YouTube video ID (may be empty)
+  updatedAt: number;
+}
+
 // ── Database class ───────────────────────────────────────────────────────────
 
 class StudyHubDB extends Dexie {
@@ -138,6 +166,8 @@ class StudyHubDB extends Dexie {
   badges!: Table<DexieBadge>;
   commitments!: Table<DexieCommitment>;
   contentChunks!: Table<DexieContentChunk>;
+  customCourses!: Table<DexieCustomCourse>;
+  customChapters!: Table<DexieCustomChapter>;
 
   constructor() {
     super("StudyHubDB");
@@ -165,6 +195,12 @@ class StudyHubDB extends Dexie {
     // v3: add contentChunks table for FlexSearch RAG
     this.version(3).stores({
       contentChunks: "chunkId, courseId",
+    });
+
+    // v4: add AI-generated custom courses and chapters
+    this.version(4).stores({
+      customCourses: "&courseId, createdAt",
+      customChapters: "&[courseId+chapterId], courseId",
     });
   }
 }

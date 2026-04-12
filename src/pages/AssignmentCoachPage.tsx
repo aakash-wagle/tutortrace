@@ -11,9 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { useGamification } from "@/contexts/GamificationContext";
 import {
-  runRubricCheck,
-  explainAssignment,
-  generateStudyPlan,
+  runAssignmentCoachAll,
   type RubricCheckResponse,
   type ExplainAssignmentResponse,
   type StudyPlanResponse,
@@ -130,65 +128,35 @@ export default function AssignmentCoachPage() {
     })),
   [assignment, requirements]);
 
-  const handleRubricCheck = async () => {
+  const hasResults = rubricResult && explainResult && planResult;
+
+  /** Single LLM call that populates all three tabs at once. */
+  const handleAnalyzeAll = useCallback(async () => {
     if (!assignment) return;
     setLoadingAi(true);
     setAiError(null);
+    setRubricResult(null);
+    setExplainResult(null);
+    setPlanResult(null);
     try {
-      const data = await runRubricCheck({
-        assignmentTitle: assignment.name,
-        requirements: requirements.length > 0 ? requirements : [descriptionText.slice(0, 500)],
-        rubricCriteria: getRubricCriteria(),
-      });
-      setRubricResult(data);
-      await addXP("RUBRIC_CHECK");
-      await unlockBadge("rubric_runner");
-    } catch {
-      setAiError("AI analysis failed. Please try again.");
-    }
-    setLoadingAi(false);
-  };
-
-  const handleExplain = useCallback(async () => {
-    if (!assignment || explainResult) return;
-    setLoadingAi(true);
-    setAiError(null);
-    try {
-      const data = await explainAssignment({
+      const data = await runAssignmentCoachAll({
         assignmentTitle: assignment.name,
         description: descriptionText,
         rubricCriteria: getRubricCriteria(),
         pointsPossible: assignment.points_possible,
-      });
-      setExplainResult(data);
-    } catch {
-      setAiError("Failed to explain assignment. Please try again.");
-    }
-    setLoadingAi(false);
-  }, [assignment, descriptionText, explainResult, getRubricCriteria]);
-
-  const handleStudyPlan = useCallback(async () => {
-    if (!assignment || planResult) return;
-    setLoadingAi(true);
-    setAiError(null);
-    try {
-      const data = await generateStudyPlan({
-        assignmentTitle: assignment.name,
+        requirements: requirements.length > 0 ? requirements : [descriptionText.slice(0, 500)],
         dueAt: assignment.due_at,
-        pointsPossible: assignment.points_possible,
-        rubricCriteria: getRubricCriteria(),
       });
-      setPlanResult(data);
-    } catch {
-      setAiError("Failed to generate study plan. Please try again.");
+      setRubricResult(data.rubricCheck);
+      setExplainResult(data.explain);
+      setPlanResult(data.studyPlan);
+      await addXP("RUBRIC_CHECK");
+      await unlockBadge("rubric_runner");
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : "AI analysis failed. Please try again.");
     }
     setLoadingAi(false);
-  }, [assignment, planResult, getRubricCriteria]);
-
-  useEffect(() => {
-    if (activeMode === "explain" && !explainResult) handleExplain();
-    if (activeMode === "plan" && !planResult) handleStudyPlan();
-  }, [activeMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [assignment, descriptionText, requirements, getRubricCriteria, addXP, unlockBadge]);
 
   if (assignmentLoading) {
     return (
@@ -309,25 +277,26 @@ export default function AssignmentCoachPage() {
             </div>
           )}
 
-          {/* Rubric Check */}
-          {activeMode === "rubric-check" && !rubricResult && (
+          {/* Single entry point — loads all tabs in one call */}
+          {!hasResults && (
             <div>
-              <h2 className="mb-1 text-base font-bold">AI Rubric Check</h2>
+              <h2 className="mb-1 text-base font-bold">AI Assignment Coach</h2>
               <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
-                Get AI-powered analysis of what this assignment expects and how to earn full marks on every rubric criterion.
+                Analyze this assignment once to get a rubric check, plain-language explanation, and a personalized study plan — all in one go.
               </p>
-              <Button className="w-full" onClick={handleRubricCheck} disabled={loadingAi}>
-                {loadingAi ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analyzing...</> : "Run Rubric Check"}
+              <Button className="w-full" onClick={handleAnalyzeAll} disabled={loadingAi}>
+                {loadingAi ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analyzing…</> : "Analyze Assignment"}
               </Button>
               {loadingAi && <Progress value={undefined} className="mt-2 h-1.5 animate-pulse" />}
             </div>
           )}
 
-          {activeMode === "rubric-check" && rubricResult && (
+          {/* Rubric Check */}
+          {activeMode === "rubric-check" && hasResults && rubricResult && (
             <div>
               {rubricResult.isMock && (
                 <div className="mb-3 rounded-xl border-2 border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
-                  Using sample analysis. Configure <code>VITE_LITELLM_BASE_URL</code> for AI-powered feedback.
+                  Using sample analysis. Configure <code>VITE_LLM_BASE_URL</code> and <code>VITE_LLM_MODEL</code> for AI-powered feedback.
                 </div>
               )}
               <h2 className="mb-1 text-base font-bold">Analysis Results</h2>
@@ -367,113 +336,83 @@ export default function AssignmentCoachPage() {
                   </ol>
                 </div>
               )}
-              <Button variant="outline" className="mt-4 w-full border-2" onClick={() => setRubricResult(null)}>
-                Run Again
+              <Button variant="outline" className="mt-4 w-full border-2" onClick={handleAnalyzeAll} disabled={loadingAi}>
+                {loadingAi ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analyzing…</> : "Re-analyze"}
               </Button>
             </div>
           )}
 
           {/* Explain */}
-          {activeMode === "explain" && (
+          {activeMode === "explain" && hasResults && explainResult && (
             <div>
               <h2 className="mb-4 text-base font-bold">Assignment Explained</h2>
-              {loadingAi && !explainResult && (
-                <div>
-                  <Progress value={undefined} className="mb-3 h-1.5 animate-pulse" />
-                  <p className="text-sm text-muted-foreground">Generating plain-language explanation…</p>
+              {explainResult.isMock && (
+                <div className="mb-3 rounded-xl border-2 border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
+                  Using sample explanation. Configure <code>VITE_LLM_BASE_URL</code> and <code>VITE_LLM_MODEL</code> for AI content.
                 </div>
               )}
-              {explainResult && (
-                <div>
-                  {explainResult.isMock && (
-                    <div className="mb-3 rounded-xl border-2 border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
-                      Using sample explanation. Configure <code>VITE_LITELLM_BASE_URL</code> for AI content.
-                    </div>
-                  )}
-                  <div className="mb-5 rounded-xl border-2 border-foreground bg-muted p-4 shadow-neo-brown">
-                    <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-accent">TL;DR</p>
-                    <p className="text-sm leading-relaxed">{explainResult.tldr}</p>
+              <div className="mb-5 rounded-xl border-2 border-foreground bg-muted p-4 shadow-neo-brown">
+                <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-accent">TL;DR</p>
+                <p className="text-sm leading-relaxed">{explainResult.tldr}</p>
+              </div>
+              <p className="mb-2 text-sm font-bold">What You Need to Do</p>
+              <div className="mb-4 space-y-2">
+                {explainResult.keyRequirements.map((req, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent" />
+                    <p className="text-sm leading-relaxed">{req}</p>
                   </div>
-                  <p className="mb-2 text-sm font-bold">What You Need to Do</p>
-                  <div className="mb-4 space-y-2">
-                    {explainResult.keyRequirements.map((req, i) => (
+                ))}
+              </div>
+              {explainResult.commonMistakes.length > 0 && (
+                <>
+                  <p className="mb-2 text-sm font-bold">Common Mistakes to Avoid</p>
+                  <div className="space-y-2">
+                    {explainResult.commonMistakes.map((m, i) => (
                       <div key={i} className="flex items-start gap-2">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent" />
-                        <p className="text-sm leading-relaxed">{req}</p>
+                        <span className="flex-shrink-0 text-sm">⚠️</span>
+                        <p className="text-sm leading-relaxed">{m}</p>
                       </div>
                     ))}
                   </div>
-                  {explainResult.commonMistakes.length > 0 && (
-                    <>
-                      <p className="mb-2 text-sm font-bold">Common Mistakes to Avoid</p>
-                      <div className="space-y-2">
-                        {explainResult.commonMistakes.map((m, i) => (
-                          <div key={i} className="flex items-start gap-2">
-                            <span className="flex-shrink-0 text-sm">⚠️</span>
-                            <p className="text-sm leading-relaxed">{m}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-4 border-2"
-                    onClick={() => { setExplainResult(null); handleExplain(); }}
-                  >
-                    Regenerate
-                  </Button>
-                </div>
+                </>
               )}
+              <Button variant="outline" size="sm" className="mt-4 border-2" onClick={handleAnalyzeAll} disabled={loadingAi}>
+                {loadingAi ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analyzing…</> : "Re-analyze"}
+              </Button>
             </div>
           )}
 
           {/* Study Plan */}
-          {activeMode === "plan" && (
+          {activeMode === "plan" && hasResults && planResult && (
             <div>
               <h2 className="mb-4 text-base font-bold">Study Plan</h2>
-              {loadingAi && !planResult && (
-                <div>
-                  <Progress value={undefined} className="mb-3 h-1.5 animate-pulse" />
-                  <p className="text-sm text-muted-foreground">Generating your personalized study plan…</p>
+              {planResult.isMock && (
+                <div className="mb-3 rounded-xl border-2 border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
+                  Using sample plan. Configure <code>VITE_LLM_BASE_URL</code> and <code>VITE_LLM_MODEL</code> for a personalized plan.
                 </div>
               )}
-              {planResult && (
-                <div>
-                  {planResult.isMock && (
-                    <div className="mb-3 rounded-xl border-2 border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
-                      Using sample plan. Configure <code>VITE_LITELLM_BASE_URL</code> for a personalized plan.
-                    </div>
-                  )}
-                  <div className="mb-4 inline-flex items-center gap-1.5 rounded-xl border-2 border-border bg-muted px-3 py-1.5">
-                    <Clock className="h-4 w-4 text-accent" />
-                    <span className="text-sm font-semibold">Est. {planResult.totalEstimatedHours}h total</span>
+              <div className="mb-4 inline-flex items-center gap-1.5 rounded-xl border-2 border-border bg-muted px-3 py-1.5">
+                <Clock className="h-4 w-4 text-accent" />
+                <span className="text-sm font-semibold">Est. {planResult.totalEstimatedHours}h total</span>
+              </div>
+              {planResult.steps.map((step, i) => (
+                <div key={i} className="mb-3 flex gap-3 rounded-xl border-2 border-border bg-muted/50 p-3">
+                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background">
+                    {i + 1}
                   </div>
-                  {planResult.steps.map((step, i) => (
-                    <div key={i} className="mb-3 flex gap-3 rounded-xl border-2 border-border bg-muted/50 p-3">
-                      <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background">
-                        {i + 1}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-0.5 flex items-start justify-between gap-2">
-                          <p className="text-sm font-bold">{step.title}</p>
-                          <span className="flex-shrink-0 text-xs text-muted-foreground">~{step.estimatedMinutes}m</span>
-                        </div>
-                        <p className="text-xs leading-relaxed text-muted-foreground">{step.description}</p>
-                      </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-0.5 flex items-start justify-between gap-2">
+                      <p className="text-sm font-bold">{step.title}</p>
+                      <span className="flex-shrink-0 text-xs text-muted-foreground">~{step.estimatedMinutes}m</span>
                     </div>
-                  ))}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-2 border-2"
-                    onClick={() => { setPlanResult(null); handleStudyPlan(); }}
-                  >
-                    Regenerate
-                  </Button>
+                    <p className="text-xs leading-relaxed text-muted-foreground">{step.description}</p>
+                  </div>
                 </div>
-              )}
+              ))}
+              <Button variant="outline" size="sm" className="mt-2 border-2" onClick={handleAnalyzeAll} disabled={loadingAi}>
+                {loadingAi ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analyzing…</> : "Re-analyze"}
+              </Button>
             </div>
           )}
 

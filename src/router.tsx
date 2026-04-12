@@ -19,6 +19,10 @@ const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
 const CalendarPage = lazy(() => import("@/pages/CalendarPage"));
 const GradesPage = lazy(() => import("@/pages/GradesPage"));
 const MessagesPage = lazy(() => import("@/pages/MessagesPage"));
+const MyCoursesPage = lazy(() => import("@/pages/MyCourses"));
+const CreateCoursePage = lazy(() => import("@/pages/CreateCoursePage"));
+const CourseEditorPage = lazy(() => import("@/pages/CourseEditorPage"));
+const CourseLearnPage = lazy(() => import("@/pages/CourseLearnPage"));
 
 function PageLoader() {
   return (
@@ -77,6 +81,10 @@ export const routes: RouteObject[] = [
       { path: "/accountability", element: <AccountabilityPage /> },
       { path: "/achievements", element: <AchievementsPage /> },
       { path: "/settings", element: <SettingsPage /> },
+      { path: "/my-courses", element: <MyCoursesPage /> },
+      { path: "/my-courses/create", element: <CreateCoursePage /> },
+      { path: "/my-courses/:courseId", element: <CourseEditorPage /> },
+      { path: "/my-courses/:courseId/learn", element: <CourseLearnPage /> },
     ],
   },
 ];

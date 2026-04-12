@@ -55,7 +55,12 @@ Required variables in `.env`:
 | `CANVAS_REDIRECT_URI` | OAuth callback URL | For Canvas mode |
 | `PORT` | Proxy Server Port (`3001` for dev) | Yes |
 | `VITE_CANVAS_PROXY_BASE` | URL for the SPA to hit the proxy (`http://localhost:3001`) | Yes |
-| `GOOGLE_GEMINI_API_KEY` | Gemini API key from Google AI Studio | For AI features |
+| `VITE_LLM_BASE_URL` | OpenAI-compatible base URL. **Groq:** `https://api.groq.com/openai/v1`. **LiteLLM:** e.g. `http://127.0.0.1:4000/v1`, or `/api/llm/v1` with `LLM_PROXY_TARGET` in dev | For AI features |
+| `VITE_LLM_MODEL` | Model id (Groq examples: `openai/gpt-oss-20b`, `llama-3.3-70b-versatile`, `llama-3.1-8b-instant` — see [Groq models](https://console.groq.com/docs/models)) | For AI features |
+| `VITE_LLM_API_KEY` | Bearer for the gateway (Groq: create at [API keys](https://console.groq.com/keys)) | For Groq / secured gateways |
+| `LLM_PROXY_TARGET` | (Dev only, not `VITE_*`) LiteLLM origin for Vite proxy — use with `VITE_LLM_BASE_URL=/api/llm/v1` | If LiteLLM hits CORS from the dev server |
+
+Groq gives a **single hosted API** (no LiteLLM required): set base URL and key above, pick a model from their docs. For **quality vs RPM vs context**: on paid **Developer** plans, production models are listed at **~1K RPM** and **128K context**; **`openai/gpt-oss-20b`** is the usual sweet spot (very fast tokens/sec, **65K max output**, strong quality). Use **`llama-3.3-70b-versatile`** when you want maximum reasoning (**32K max output**). Free-tier RPM/TPM are lower — see [rate limits](https://console.groq.com/docs/rate-limits).
 
 ### 3. Run the Backend Proxy
 

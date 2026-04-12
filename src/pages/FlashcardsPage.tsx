@@ -22,7 +22,7 @@ import { AnimatedCardList, AnimatedCard } from "@/components/AnimatedCardList";
 import { useGamification } from "@/contexts/GamificationContext";
 import { db } from "@/lib/db";
 import { fetchCourseModules } from "@/lib/canvas";
-import { generateFlashcards } from "@/lib/aiService";
+import { generateFlashcards, isAiConfigured } from "@/lib/aiService";
 
 export default function FlashcardsPage() {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function FlashcardsPage() {
     [userId]
   );
 
-  const aiStatus = { configured: !!import.meta.env.VITE_LITELLM_API_KEY };
+  const aiStatus = { configured: isAiConfigured };
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<string>("");
