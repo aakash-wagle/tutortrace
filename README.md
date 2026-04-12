@@ -1,4 +1,4 @@
-# StudyHub -- Canvas Copilot
+# TutorTrace -- Canvas Copilot
 
 AI-powered study assistant that connects to Canvas LMS (configured for PSU). Built with Next.js, React, MUI, and Gemini AI.
 
