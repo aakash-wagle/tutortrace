@@ -9,7 +9,7 @@ import {
   ReactNode,
 } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/lib/dexie";
+import { db } from "@/lib/db";
 import {
   computeLevel,
   xpProgressPercent,
@@ -25,11 +25,6 @@ import {
   getNightOwlBadge,
   getEarlyBirdBadge,
 } from "@/lib/gamification";
-import {
-  syncGamificationToSupabase,
-  syncUnsyncedXPEvents,
-  syncUnsyncedBadges,
-} from "@/lib/supabase-sync";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -76,13 +71,13 @@ const GamificationContext = createContext<GamificationState>(defaultState);
 export function GamificationProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Resolve userId from session once on mount
+  // Resolve userId from Dexie once on mount (replaces old fetch('/api/auth/session'))
   useEffect(() => {
-    fetch("/api/auth/session")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.canvasUserId) setUserId(data.canvasUserId);
-        else if (data?.isDemo) setUserId("demo");
+    db.users
+      .toCollection()
+      .first()
+      .then((user) => {
+        if (user) setUserId(user.id);
       })
       .catch(() => {});
   }, []);
@@ -149,10 +144,6 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         row.coins += def.coinReward;
         row.updatedAt = Date.now();
       });
-
-      // Background sync
-      syncUnsyncedBadges(userId).catch(() => {});
-      syncGamificationToSupabase(userId).catch(() => {});
     },
     [userId, ensureGamificationRow]
   );
@@ -181,10 +172,6 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         row.level = computeLevel(row.xp);
         row.updatedAt = now;
       });
-
-      // Background sync
-      syncUnsyncedXPEvents(userId).catch(() => {});
-      syncGamificationToSupabase(userId).catch(() => {});
     },
     [userId, ensureGamificationRow]
   );
@@ -261,8 +248,6 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
       if (nightBadge) await unlockBadge(nightBadge);
       const earlyBadge = getEarlyBirdBadge();
       if (earlyBadge) await unlockBadge(earlyBadge);
-
-      syncGamificationToSupabase(userId).catch(() => {});
     },
     [userId, ensureGamificationRow, unlockBadge, addXP]
   );

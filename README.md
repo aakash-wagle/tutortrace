@@ -1,26 +1,26 @@
 # TutorTrace -- Canvas Copilot
 
-AI-powered study assistant that connects to Canvas LMS (configured for PSU). Built with Next.js, React, MUI, and Gemini AI.
+AI-powered study assistant that connects to Canvas LMS (configured for PSU). Built with React, Vite, Dexie.js (offline-first), MUI, and Gemini AI.
 
 ## Features
 
-- **Canvas OAuth2 Integration** -- Connect your Penn State Canvas account securely
-- **Today Dashboard** -- See due assignments, recent changes, announcements, and AI recommendations
-- **My Courses** -- Browse all active courses with progress tracking and next-due assignments
-- **Course Detail** -- View all assignments for a course and launch the coach
-- **Assignment Coach** -- 3-pane view with rubric criteria, interactive checklist, and AI-powered rubric self-check
-- **AI Flashcard Generator** -- Select course content sources (modules, assignments, pages) and auto-generate flashcards with Gemini AI, then study with an interactive flip-card view
-- **Demo Mode** -- Full app experience without Canvas credentials using mock data
+- **Local-First & Offline Capable** -- Data is synced and stored locally via Dexie.js (IndexedDB) for instant access.
+- **Canvas OAuth2 Integration** -- Connect your Penn State Canvas account securely via a lightweight proxy.
+- **Today Dashboard** -- See due assignments, recent changes, announcements, and AI recommendations.
+- **My Courses** -- Browse all active courses with progress tracking and next-due assignments.
+- **Course Detail** -- View all assignments for a course and launch the coach.
+- **Assignment Coach** -- 3-pane view with rubric criteria, interactive checklist, and AI-powered rubric self-check.
+- **AI Flashcard Generator** -- Select course content sources (modules, assignments, pages) and auto-generate flashcards with Gemini AI, then study with an interactive flip-card view.
+- **Demo Mode** -- Full app experience without Canvas credentials using mock data.
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router) + TypeScript
-- **UI**: Material UI (MUI) v7 + Emotion
-- **Auth**: Canvas OAuth2 + iron-session
-- **Database**: Prisma + SQLite (dev) / Postgres (production)
-- **AI**: Google Gemini 1.5 Flash
-- **Data Fetching**: SWR
-- **Deployment**: Vercel
+- **Framework**: React 19 + Vite (SPA) + TypeScript
+- **Routing**: React Router DOM v6
+- **UI**: Material UI (MUI) v7 + Tailwind CSS v3
+- **Database**: Dexie.js (IndexedDB)
+- **Auth & Proxy**: Express.js (Thin proxy to bypass Canvas CORS & handle OAuth2)
+- **AI**: Google Gemini SDK
 
 ## Getting Started
 
@@ -41,38 +41,39 @@ npm install
 Copy the example and fill in your values:
 
 ```bash
-cp .env.local.example .env.local
+cp .env.local.example .env
 ```
 
-Required variables in `.env.local`:
+Required variables in `.env`:
 
 | Variable | Description | Required |
 |---|---|---|
-| `NEXT_PUBLIC_APP_URL` | App URL (`http://localhost:3000` for dev) | Yes |
+| `SPA_ORIGIN` | App URL (`http://localhost:5173` for dev) | Yes |
 | `CANVAS_BASE_URL` | Canvas instance URL (default: `https://psu.instructure.com`) | For Canvas mode |
 | `CANVAS_CLIENT_ID` | Canvas Developer Key client ID | For Canvas mode |
-| `CANVAS_CLIENT_SECRET` | Canvas Developer Key secret | For Canvas mode |
+| `CANVAS_CLIENT_SECRET` | Canvas Developer Key secret (Only needed for proxy backend) | For Canvas mode |
 | `CANVAS_REDIRECT_URI` | OAuth callback URL | For Canvas mode |
-| `SESSION_SECRET` | Random 32+ char string for cookie encryption | Yes |
-| `DATABASE_URL` | Database connection string | Yes |
+| `PORT` | Proxy Server Port (`3001` for dev) | Yes |
+| `VITE_CANVAS_PROXY_BASE` | URL for the SPA to hit the proxy (`http://localhost:3001`) | Yes |
 | `GOOGLE_GEMINI_API_KEY` | Gemini API key from Google AI Studio | For AI features |
 
-### 3. Set Up Database
+### 3. Run the Backend Proxy
+
+The Canvas API does not allow cross-origin requests from the browser, so a lightweight proxy is required.
 
 ```bash
-# SQLite for local development (already configured)
-npx prisma db push
+npm run proxy:dev
 ```
 
-For production (Postgres via Supabase), update the provider in `prisma/schema.prisma` to `"postgresql"` and set `DATABASE_URL` accordingly.
+### 4. Run the Frontend Development Server
 
-### 4. Run Development Server
+In a separate terminal, start the Vite client:
 
 ```bash
-npm run dev
+npm run vite:dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:5173](http://localhost:5173).
 
 ### 5. Try Demo Mode
 
@@ -85,36 +86,29 @@ Click **Explore Demo Mode** on the connect page to use the app with mock data --
 | `/connect` | Canvas connection + demo mode entry |
 | `/today` | Dashboard: due soon, changes, announcements, copilot |
 | `/courses` | Course grid with progress and next-due info |
-| `/courses/[id]` | Course detail with assignment list |
-| `/courses/[id]/assignments/[aid]/coach` | 3-pane assignment coach with AI rubric check |
+| `/courses/:id` | Course detail with assignment list |
+| `/courses/:courseId/assignments/:id/coach` | 3-pane assignment coach with AI rubric check |
 | `/coach` | Assignment coach landing (all coachable assignments) |
 | `/flashcards` | Flashcard deck list + AI deck generation |
-| `/flashcards/[deckId]` | Interactive flashcard study view with flip animation |
-| `/calendar` | Coming soon |
-| `/grades` | Coming soon |
-| `/messages` | Coming soon |
+| `/flashcards/:deckId` | Interactive flashcard study view with flip animation |
+| `/calendar` | Event agenda and dates |
+| `/grades` | Local grade progress |
+| `/messages` | Unified inbox |
 
-## API Routes
+## Proxy Server API
+
+Since the frontend runs completely local-first through Dexie.js, the backend only maintains minimal routes to satisfy OAuth2 and Canvas proxying:
 
 | Route | Method | Description |
 |---|---|---|
-| `/api/auth/canvas/start` | GET | Initiates Canvas OAuth flow |
-| `/api/auth/canvas/callback` | GET | Handles OAuth callback |
-| `/api/auth/session` | GET | Returns current session info (demo/connected status) |
-| `/api/canvas/courses` | GET | List user's courses |
-| `/api/canvas/courses/[id]/assignments` | GET | List course assignments |
-| `/api/canvas/courses/[id]/assignments/[aid]` | GET | Get single assignment |
-| `/api/canvas/courses/[id]/modules` | GET | List course modules with items |
-| `/api/canvas/courses/[id]/activity` | GET | Course activity stream |
-| `/api/canvas/courses/[id]/announcements` | GET | Course announcements |
-| `/api/dashboard/assignments` | GET | All assignments across courses |
-| `/api/ai/rubric-check` | POST | AI rubric analysis via Gemini |
-| `/api/flashcards` | GET | List flashcard decks |
-| `/api/flashcards/generate` | POST | Generate a new deck with AI |
-| `/api/flashcards/[deckId]` | GET/DELETE | Get or delete a deck |
-| `/api/flashcards/[deckId]/cards/[cardId]` | PATCH | Update card difficulty |
+| `/auth/canvas/start` | GET | Initiates Canvas OAuth flow |
+| `/auth/canvas/callback` | GET | Handles OAuth callback & exchanges token |
+| `/auth/canvas/token` | POST | Validates a personal access token |
+| `/auth/canvas/refresh` | POST | Refreshes an expired access token |
+| `/canvas-proxy/*` | ANY | Forwards authorized requests securely to Canvas |
+| `/health` | GET | Health check |
 
-All Canvas routes fall back to mock data in demo mode or on error.
+All Canvas proxy calls gracefully fall back to mock data when operating in demo mode or offline.
 
 ## AI Flashcard Generator
 
@@ -122,7 +116,7 @@ All Canvas routes fall back to mock data in demo mode or on error.
 2. Click **New Deck**
 3. Select a course from the dropdown
 4. Optionally select specific modules (or leave empty for all)
-5. Click **Generate Flashcards** -- Gemini AI creates 15-20 Q&A cards
+5. Click **Generate Flashcards** -- Gemini AI creates Q&A cards
 6. Study with the interactive flip-card viewer
 7. Mark each card as Easy / Medium / Hard
 8. Shuffle and repeat
@@ -133,41 +127,39 @@ Works in demo mode with mock content when no Gemini API key is configured.
 
 1. Contact PSU IT or use your Canvas Admin > Developer Keys
 2. Create a new Developer Key (API Key)
-3. Set the redirect URI to `http://localhost:3000/api/auth/canvas/callback`
-4. Copy the Client ID and Secret into your `.env.local`
+3. Set the redirect URI to `http://localhost:3001/auth/canvas/callback` (Proxy callback)
+4. Copy the Client ID and Secret into your `.env`
 5. `CANVAS_BASE_URL` is already set to `https://psu.instructure.com`
 
 ## Project Structure
 
 ```
 studyhub/
-├── prisma/schema.prisma          # DB schema (UserSession, FlashcardDeck, Flashcard)
+├── proxy/
+│   └── server.ts                 # Express proxy for Canvas and OAuth2
 ├── src/
-│   ├── app/
-│   │   ├── connect/              # Canvas connection page
-│   │   ├── today/                # Dashboard
-│   │   ├── courses/              # Course list + detail + coach
-│   │   ├── coach/                # Coach landing page
-│   │   ├── flashcards/           # Flashcard decks + study view
-│   │   ├── calendar/grades/messages/  # Stub pages
-│   │   └── api/                  # All backend routes
-│   ├── components/               # Sidebar, Topbar, AppShell, ProgressRing, etc.
+│   ├── components/               # UI components, AppShell, Sidebar, Topbar
+│   ├── contexts/                 # Gamification and other providers
 │   ├── data/mocks/               # Mock JSON for demo mode
-│   ├── hooks/                    # SWR hooks
-│   ├── lib/                      # ai.ts, canvas.ts, db.ts, demo.ts, session.ts
+│   ├── hooks/                    # Dexie useLiveQuery hooks
+│   ├── lib/                      # dexie db schemas, canvas api helpers, util functions
+│   ├── pages/                    # React Router pages (Today, Courses, Flashcards)
+│   ├── router.tsx                # App route map
+│   ├── main.tsx                  # Vite render entrypoint
+│   ├── App.tsx                   # Main React entrypoint
 │   └── theme/                    # MUI theme
-└── .env.local.example            # Environment variable template
+├── public/
+│   └── manifest.json             # PWA configuration
+├── index.html                    # Vite html template
+├── vite.config.ts                # Vite & PWA bundler config
+└── .env.example                  # Environment variable template
 ```
 
-## Deploying to Vercel
+## Setup for Production Deployment
 
-1. Push repo to GitHub
-2. Import into Vercel
-3. Set up Postgres (Supabase free tier)
-4. Update `prisma/schema.prisma` provider to `"postgresql"`
-5. Add all env vars in Vercel dashboard
-6. Set `CANVAS_REDIRECT_URI` to your production callback URL
-7. Deploy -- `postinstall` runs `prisma generate` automatically
+1. **Frontend**: Deploy the static Vite build (`npm run vite:build`) to Vercel, Netlify, or Firebase Hosting.
+2. **Proxy**: Deploy the `proxy/server.ts` standalone to Render, Railway, or Heroku.
+3. Update production `.env` files across both deployments to ensure `SPA_ORIGIN`, `VITE_CANVAS_PROXY_BASE`, and `CANVAS_REDIRECT_URI` perfectly map to your deployed URLs.
 
 ## License
 

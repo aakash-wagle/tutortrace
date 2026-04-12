@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useGamification } from "@/contexts/GamificationContext";
@@ -47,8 +47,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
-  const pathname = usePathname();
-  const router = useRouter();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { xp, level, xpProgress, xpToNext, streak, isLoaded } = useGamification();
 
   const isActive = (href: string) => {
@@ -69,7 +69,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     const active = isActive(href);
     return (
       <motion.button
-        onClick={() => href !== "#" && router.push(href)}
+        onClick={() => href !== "#" && navigate(href)}
         className={cn(
           "flex w-full items-center rounded-xl px-3 py-2.5 text-left transition-colors",
           collapsed ? "justify-center gap-0" : "gap-3",

@@ -1,78 +1,94 @@
-"use client";
+import { useState, useEffect } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "@/lib/db";
+import { canvasApiFetch } from "@/lib/canvas";
 
-import useSWR from "swr";
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+// ── Dexie-backed Hooks ──────────────────────────────────────────────────────
 
 export function useCourses() {
-  return useSWR("/api/canvas/courses", fetcher);
+  const data = useLiveQuery(() => db.courses.toArray());
+  return { data, error: null, isLoading: data === undefined };
 }
 
-export function useAssignments(courseId: string | number) {
-  return useSWR(
-    courseId ? `/api/canvas/courses/${courseId}/assignments` : null,
-    fetcher
+export function useAssignments(courseId?: string | number | null) {
+  const data = useLiveQuery(
+    () => (courseId ? db.assignments.where({ courseId: Number(courseId) }).toArray() : []),
+    [courseId]
   );
+  return { data, error: null, isLoading: data === undefined && courseId != null };
 }
 
 export function useAssignment(courseId: string | number, assignmentId: string | number) {
-  return useSWR(
-    courseId && assignmentId
-      ? `/api/canvas/courses/${courseId}/assignments/${assignmentId}`
-      : null,
-    fetcher
+  const data = useLiveQuery(
+    () => (assignmentId ? db.assignments.get(Number(assignmentId)) : undefined),
+    [assignmentId]
   );
+  return { data, error: null, isLoading: data === undefined && assignmentId != null };
+}
+
+export function useDashboardAssignments() {
+  const data = useLiveQuery(() => db.assignments.toArray());
+  return { data, error: null, isLoading: data === undefined };
+}
+
+// ── Live Canvas Hooks (for data not synced to Dexie) ────────────────────────
+
+function useCanvasEndpoint(path: string | null) {
+  const [data, setData] = useState<any>(null);
+  const [error, setError] = useState<any>(null);
+  const user = useLiveQuery(() => db.users.toCollection().first());
+
+  useEffect(() => {
+    if (!path || !user) return;
+    setData(null);
+    setError(null);
+    canvasApiFetch(user.id, path)
+      .then((res) => {
+        if (!res.ok) throw new Error("Canvas API Error");
+        return res.json();
+      })
+      .then(setData)
+      .catch(setError);
+  }, [path, user?.id]);
+
+  return { data, error, isLoading: !data && !error && path != null };
 }
 
 export function useActivity(courseId: string | number) {
-  return useSWR(
-    courseId ? `/api/canvas/courses/${courseId}/activity` : null,
-    fetcher
-  );
+  return useCanvasEndpoint(courseId ? `/courses/${courseId}/activity_stream` : null);
 }
 
 export function useAnnouncements(courseId: string | number) {
-  return useSWR(
-    courseId ? `/api/canvas/courses/${courseId}/announcements` : null,
-    fetcher
+  return useCanvasEndpoint(
+    courseId ? `/courses/${courseId}/discussion_topics?only_announcements=true` : null
   );
 }
 
 export function useTodo() {
-  return useSWR("/api/canvas/todo", fetcher);
+  return useCanvasEndpoint("/users/self/todo");
 }
 
 export function useUpcomingEvents() {
-  return useSWR("/api/canvas/upcoming", fetcher);
+  return useCanvasEndpoint("/users/self/upcoming_events");
 }
 
 export function useCalendarEvents(startDate?: string, endDate?: string) {
-  const params = new URLSearchParams();
-  if (startDate) params.set("start_date", startDate);
-  if (endDate) params.set("end_date", endDate);
-  const qs = params.toString();
-  return useSWR(`/api/canvas/calendar${qs ? `?${qs}` : ""}`, fetcher);
+  const query = startDate && endDate ? `?start_date=${startDate}&end_date=${endDate}` : "";
+  return useCanvasEndpoint(query ? `/calendar_events${query}` : null);
 }
 
 export function useGrades() {
-  return useSWR("/api/canvas/grades", fetcher);
+  return useCanvasEndpoint("/users/self/enrollments");
 }
 
 export function useConversations() {
-  return useSWR("/api/canvas/conversations", fetcher);
+  return useCanvasEndpoint("/conversations");
 }
 
 export function useConversation(id: string | number | null) {
-  return useSWR(
-    id ? `/api/canvas/conversations/${id}` : null,
-    fetcher
-  );
+  return useCanvasEndpoint(id ? `/conversations/${id}` : null);
 }
 
 export function useGlobalActivity() {
-  return useSWR("/api/canvas/activity", fetcher);
-}
-
-export function useDashboardAssignments() {
-  return useSWR("/api/dashboard/assignments", fetcher);
+  return useCanvasEndpoint("/users/self/activity_stream");
 }
