@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trophy } from "lucide-react";
+import { Trophy, Sparkles, Zap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { StudyOwl } from "@/components/StudyOwl";
 import { useGamification } from "@/contexts/GamificationContext";
+import { useAchievementToast } from "@/hooks/useAchievementToast";
 import { BADGE_DEFS, BadgeDef } from "@/lib/gamification";
 
 const containerVariants = {
@@ -66,7 +67,10 @@ function BadgeCard({ def, unlocked }: { def: BadgeDef; unlocked: boolean }) {
 
 export default function AchievementsPage() {
   const { unlockedBadges, xp, level, coins, isLoaded, logActivity } = useGamification();
-  const [newBadge, setNewBadge] = useState<BadgeDef | null>(null);
+  const { triggerAchievement, lastMessage, isGenerating } = useAchievementToast();
+
+  const [celebrationBadge, setCelebrationBadge] = useState<BadgeDef | null>(null);
+  const [aiCelebrationText, setAiCelebrationText] = useState<string | null>(null);
   const prevBadgeCount = useRef(0);
 
   useEffect(() => {
@@ -75,16 +79,29 @@ export default function AchievementsPage() {
 
   useEffect(() => {
     if (!isLoaded) return;
+
     if (unlockedBadges.length > prevBadgeCount.current && prevBadgeCount.current > 0) {
       const latestId = unlockedBadges[unlockedBadges.length - 1];
       const def = BADGE_DEFS.find((b) => b.id === latestId);
+
       if (def) {
-        setNewBadge(def);
-        setTimeout(() => setNewBadge(null), 3500);
+        setCelebrationBadge(def);
+        setAiCelebrationText(null);
+
+        // Fire the AI hype generator and capture the response for the overlay
+        triggerAchievement({ type: "badge", value: def.name }).then((msg) => {
+          setAiCelebrationText(msg.message);
+        });
+
+        setTimeout(() => {
+          setCelebrationBadge(null);
+          setAiCelebrationText(null);
+        }, 6000);
       }
     }
+
     prevBadgeCount.current = unlockedBadges.length;
-  }, [unlockedBadges, isLoaded]);
+  }, [unlockedBadges, isLoaded, triggerAchievement]);
 
   const unlocked = unlockedBadges.length;
   const total = BADGE_DEFS.length;
@@ -92,27 +109,43 @@ export default function AchievementsPage() {
 
   return (
     <>
-      {/* New badge celebration overlay */}
+      {/* ── Badge unlock celebration overlay ─────────────────────────────── */}
       <AnimatePresence>
-        {newBadge && (
+        {celebrationBadge && (
           <motion.div
             initial={{ opacity: 0, y: -60, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -60, scale: 0.8 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="fixed left-1/2 top-20 z-[9999] flex min-w-[260px] -translate-x-1/2 items-center gap-3 rounded-xl border-2 border-foreground bg-background p-4 shadow-neo"
+            className="fixed left-1/2 top-20 z-[9999] flex min-w-[300px] max-w-[420px] -translate-x-1/2 items-start gap-3 rounded-2xl border-2 border-foreground bg-background p-5 shadow-neo"
           >
-            <span className="text-4xl">{newBadge.icon}</span>
-            <div>
-              <p className="text-sm font-bold leading-tight">Badge Unlocked!</p>
-              <p className="text-xs text-muted-foreground">{newBadge.name}</p>
+            <span className="text-4xl leading-none">{celebrationBadge.icon}</span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-sm font-bold leading-tight">Badge Unlocked!</p>
+                {isGenerating && (
+                  <span className="flex h-4 w-4 items-center justify-center">
+                    <span className="h-2.5 w-2.5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  </span>
+                )}
+              </div>
+              <p className="text-xs font-semibold text-primary">{celebrationBadge.name}</p>
+              {aiCelebrationText ? (
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                  {aiCelebrationText}
+                </p>
+              ) : (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {celebrationBadge.description}
+                </p>
+              )}
             </div>
             <StudyOwl mood="celebrating" size="sm" />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Header */}
+      {/* ── Header ───────────────────────────────────────────────────────── */}
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="mb-0.5 flex items-center gap-2">
@@ -146,7 +179,41 @@ export default function AchievementsPage() {
         </div>
       </div>
 
-      {/* Badge grid */}
+      {/* ── Last AI message ───────────────────────────────────────────────── */}
+      {lastMessage && (
+        <Card className="relative mb-6 overflow-hidden border-2 border-primary/20 shadow-neo-sm">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+          <CardContent className="relative flex items-start gap-3 p-4">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <Sparkles className="h-4 w-4 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="mb-0.5 flex items-center gap-2">
+                <p className="text-xs font-bold">Latest Achievement Message</p>
+                <Badge className="h-4 border-0 bg-primary/10 text-[10px] font-bold text-primary">
+                  AI
+                </Badge>
+              </div>
+              <p className="text-sm leading-relaxed text-foreground/90">{lastMessage.message}</p>
+              {lastMessage.badge_label && (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Achievement: {lastMessage.badge_label}
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Badge grid ───────────────────────────────────────────────────── */}
+      <div className="mb-4 flex items-center gap-2">
+        <Zap className="h-4 w-4 text-muted-foreground" />
+        <p className="text-sm font-bold">Badge Collection</p>
+        <Badge variant="outline" className="ml-auto text-xs">
+          {unlocked}/{total}
+        </Badge>
+      </div>
+
       <motion.div
         variants={containerVariants}
         initial="hidden"

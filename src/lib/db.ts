@@ -152,6 +152,23 @@ export interface DexieCustomChapter {
   updatedAt: number;
 }
 
+export interface DexieScheduleBlock {
+  id: string;                 // e.g. "assignmentId-date-sessionIdx"
+  userId: string;
+  assignmentId: number;
+  assignmentName: string;
+  courseId: number;
+  date: string;               // YYYY-MM-DD
+  startHour: number;          // 24h
+  startMinute: number;
+  durationMinutes: number;
+  priority: "critical" | "high" | "medium" | "low";
+  completed: boolean;
+  dueAt: string | null;
+  pointsPossible: number;
+  updatedAt: number;
+}
+
 // ── Database class ───────────────────────────────────────────────────────────
 
 class StudyHubDB extends Dexie {
@@ -168,6 +185,7 @@ class StudyHubDB extends Dexie {
   contentChunks!: Table<DexieContentChunk>;
   customCourses!: Table<DexieCustomCourse>;
   customChapters!: Table<DexieCustomChapter>;
+  schedules!: Table<DexieScheduleBlock>;
 
   constructor() {
     super("StudyHubDB");
@@ -201,6 +219,11 @@ class StudyHubDB extends Dexie {
     this.version(4).stores({
       customCourses: "&courseId, createdAt",
       customChapters: "&[courseId+chapterId], courseId",
+    });
+
+    // v5: add dynamic schedule blocks for the Week Planner
+    this.version(5).stores({
+      schedules: "id, userId, date, assignmentId, completed",
     });
   }
 }

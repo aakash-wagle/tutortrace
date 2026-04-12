@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Flame,
   BookMarked,
+  ListTodo,
 } from "lucide-react";
 
 export const SIDEBAR_EXPANDED_WIDTH = 240;
@@ -31,6 +32,7 @@ const mainNav = [
   { label: "My Courses", icon: BookMarked, href: "/my-courses" },
   { label: "Coach", icon: BookOpen, href: "/coach" },
   { label: "Flashcards", icon: Layers, href: "/flashcards" },
+  { label: "Weekly Planner", icon: ListTodo, href: "/weekly-planner" },
   { label: "Calendar", icon: CalendarDays, href: "/calendar" },
   { label: "Grades", icon: BarChart2, href: "/grades" },
   { label: "Messages", icon: MessageSquare, href: "/messages" },

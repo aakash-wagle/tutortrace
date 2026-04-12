@@ -49,6 +49,12 @@ export default defineConfig(({ mode }) => {
               target: llmProxyTarget!.replace(/\/$/, ""),
               changeOrigin: true,
               rewrite: (p) => p.replace(/^\/api\/llm/, ""),
+              configure: (proxy, _options) => {
+                proxy.on("proxyReq", (proxyReq, req, _res) => {
+                  proxyReq.removeHeader("origin");
+                  proxyReq.removeHeader("referer");
+                });
+              },
             },
           },
         }
