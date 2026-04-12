@@ -1,7 +1,5 @@
-"use client";
-
 import { BellRing } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -18,7 +16,7 @@ function fmtTime(s: number): string {
 }
 
 export default function NudgeAlert({ secondsRemaining, streakCount, visible }: Props) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   if (!visible) return null;
 
@@ -39,7 +37,7 @@ export default function NudgeAlert({ secondsRemaining, streakCount, visible }: P
       </div>
       <Button
         size="sm"
-        onClick={() => router.push("/coach")}
+        onClick={() => navigate("/coach")}
         className="flex-shrink-0 bg-orange-600 text-white hover:bg-orange-700"
       >
         Study Now

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { db } from "@/lib/dexie";
 import { Search, Bell, School, GraduationCap, BookOpen } from "lucide-react";
@@ -22,7 +22,7 @@ interface SearchResult {
 }
 
 export default function Topbar({ isDemo = true, displayName, sidebarWidth }: TopbarProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -70,9 +70,9 @@ export default function Topbar({ isDemo = true, displayName, sidebarWidth }: Top
     setResults([]);
     setOpen(false);
     if (result.type === "course") {
-      router.push(`/courses/${result.id}`);
+      navigate(`/courses/${result.id}`);
     } else if (result.courseId) {
-      router.push(`/courses/${result.courseId}/assignments/${result.id}/coach`);
+      navigate(`/courses/${result.courseId}/assignments/${result.id}/coach`);
     }
   };
 
@@ -165,14 +165,14 @@ export default function Topbar({ isDemo = true, displayName, sidebarWidth }: Top
         <Bell className="h-4 w-4" />
       </button>
       <button
-        onClick={() => router.push("/settings")}
+        onClick={() => navigate("/settings")}
         className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
       >
         <School className="h-4 w-4" />
       </button>
       <Avatar
         className="h-8 w-8 cursor-pointer border-2 border-border"
-        onClick={() => router.push("/settings")}
+        onClick={() => navigate("/settings")}
       >
         <AvatarFallback className="bg-accent text-accent-foreground text-xs font-bold">
           {initial}

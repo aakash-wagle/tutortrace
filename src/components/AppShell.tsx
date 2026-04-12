@@ -3,22 +3,14 @@
 import { useState } from "react";
 import Sidebar, { SIDEBAR_COLLAPSED_WIDTH, SIDEBAR_EXPANDED_WIDTH } from "./Sidebar";
 import Topbar from "./Topbar";
-import useSWR from "swr";
+import { useLocation } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "@/lib/db";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePathname } from "next/navigation";
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
-
-interface SessionInfo {
-  isDemo: boolean;
-  displayName: string | null;
-  avatarUrl: string | null;
-  connected: boolean;
-}
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSWR<SessionInfo>("/api/auth/session", fetcher);
-  const pathname = usePathname();
+  const user = useLiveQuery(() => db.users.toCollection().first());
+  const { pathname } = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const sidebarWidth = sidebarCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH;
@@ -34,8 +26,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         style={{ marginLeft: sidebarWidth }}
       >
         <Topbar
-          isDemo={session?.isDemo ?? true}
-          displayName={session?.displayName ?? null}
+          isDemo={user?.isDemo ?? true}
+          displayName={user?.displayName ?? null}
           sidebarWidth={sidebarWidth}
         />
         <main className="mt-[60px] flex-1 p-6">
