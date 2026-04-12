@@ -38,3 +38,13 @@ next-env.d.ts
 # prisma
 prisma/dev.db
 prisma/dev.db-journal
+
+# Secrets
+course-plan-service/gcp-service-account.json
+course-plan-service/.env
+
+# Build cache
+course-plan-frontend/.next/
+
+course-plan-service/node_modules/
+course-plan-frontend/node_modules/
