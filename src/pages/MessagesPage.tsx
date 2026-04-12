@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import useSWR from "swr";
+import { useLiveQuery } from "dexie-react-hooks";
 import { Mail, MailOpen, ArrowLeft, Send, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { useConversations, useConversation } from "@/hooks/useApi";
+import { db } from "@/lib/db";
+import { CANVAS_PROXY_BASE } from "@/lib/canvas";
 
 interface Participant {
   id: number;
@@ -77,28 +76,36 @@ export default function MessagesPage() {
   const [replyText, setReplyText] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
 
-  const { data: conversations, isLoading: listLoading } = useSWR<Conversation[]>(
-    "/api/canvas/conversations",
-    fetcher
-  );
+  const currentUser = useLiveQuery(() => db.users.toCollection().first());
 
-  const { data: detail, isLoading: detailLoading, mutate: mutateDetail } = useSWR<ConversationDetail>(
-    selectedId ? `/api/canvas/conversations/${selectedId}` : null,
-    fetcher
-  );
+  // Conversations list — uses the established canvasApiFetch pattern via useCanvasEndpoint
+  const { data: conversationsRaw, isLoading: listLoading } = useConversations();
+  const conversations = conversationsRaw as Conversation[] | null;
+
+  // Conversation detail — re-fetches when replyCount changes
+  const { data: detailRaw, isLoading: detailLoading } = useConversation(selectedId);
+  const detail = detailRaw as ConversationDetail | null;
 
   const handleSendReply = async () => {
-    if (!replyText.trim() || !selectedId) return;
+    if (!replyText.trim() || !selectedId || !currentUser) return;
     setSendingReply(true);
     try {
-      const res = await fetch(`/api/canvas/conversations/${selectedId}/reply`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: replyText.trim() }),
-      });
+      // Canvas API docs: POST /api/v1/conversations/:id/add_message
+      // Route through the proxy at /canvas-proxy/v1/conversations/:id/add_message
+      const res = await fetch(
+        `${CANVAS_PROXY_BASE}/canvas-proxy/v1/conversations/${selectedId}/add_message`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${currentUser.accessToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ body: replyText.trim() }),
+        }
+      );
       if (res.ok) {
         setReplyText("");
-        mutateDetail();
       }
     } finally {
       setSendingReply(false);
