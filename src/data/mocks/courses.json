@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1001,
+    "name": "Chemical Reactions & Equilibrium",
+    "course_code": "CHEM 201",
+    "enrollment_term_id": 1,
+    "term": "Spring 2024",
+    "section": "Section 01",
+    "teachers": [{ "display_name": "Dr. Sarah Chen" }],
+    "image_download_url": null,
+    "computed_current_score": 78,
+    "next_due": {
+      "name": "Lab Report 4",
+      "due_at": "2024-03-02T23:59:00Z"
+    }
+  },
+  {
+    "id": 1002,
+    "name": "Renaissance to Modern",
+    "course_code": "ART 105",
+    "enrollment_term_id": 1,
+    "term": "Spring 2024",
+    "section": "Section 01",
+    "teachers": [{ "display_name": "Prof. Michael Torres" }],
+    "image_download_url": null,
+    "computed_current_score": 65,
+    "next_due": {
+      "name": "Essay Analysis",
+      "due_at": "2024-03-04T23:59:00Z"
+    }
+  },
+  {
+    "id": 1003,
+    "name": "Integral Calculus",
+    "course_code": "CALC 202",
+    "enrollment_term_id": 1,
+    "term": "Spring 2024",
+    "section": "Section 02",
+    "teachers": [{ "display_name": "Dr. James Wilson" }],
+    "image_download_url": null,
+    "computed_current_score": 92,
+    "next_due": {
+      "name": "Problem Set 9",
+      "due_at": "2024-02-28T23:59:00Z"
+    }
+  },
+  {
+    "id": 1004,
+    "name": "Cell Biology Fundamentals",
+    "course_code": "BIO 101",
+    "enrollment_term_id": 1,
+    "term": "Spring 2024",
+    "section": "Section 03",
+    "teachers": [{ "display_name": "Dr. Emily Martinez" }],
+    "image_download_url": null,
+    "computed_current_score": 45,
+    "next_due": {
+      "name": "Chapter Review",
+      "due_at": "2024-03-05T23:59:00Z"
+    }
+  },
+  {
+    "id": 1005,
+    "name": "Data Structures",
+    "course_code": "CS 250",
+    "enrollment_term_id": 1,
+    "term": "Spring 2024",
+    "section": "Section 01",
+    "teachers": [{ "display_name": "Prof. David Kim" }],
+    "image_download_url": null,
+    "computed_current_score": 88,
+    "next_due": {
+      "name": "Project 3",
+      "due_at": "2024-03-01T23:59:00Z"
+    }
+  },
+  {
+    "id": 1006,
+    "name": "Cognitive Psychology",
+    "course_code": "PSY 201",
+    "enrollment_term_id": 1,
+    "term": "Spring 2024",
+    "section": "Section 02",
+    "teachers": [{ "display_name": "Dr. Lisa Anderson" }],
+    "image_download_url": null,
+    "computed_current_score": 34,
+    "next_due": {
+      "name": "Research Paper",
+      "due_at": "2024-03-08T23:59:00Z"
+    }
+  }
+]

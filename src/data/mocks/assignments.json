@@ -1,0 +1,99 @@
+[
+  {
+    "id": 5001,
+    "course_id": 1001,
+    "name": "Lab Report: Chemical Reactions",
+    "description": "<p>Write a comprehensive lab report on the chemical reactions observed in Experiment 7. Include methodology, results, and analysis sections.</p>",
+    "due_at": "2024-02-28T23:59:00Z",
+    "points_possible": 50,
+    "course_name": "Chemical Reactions & Equilibrium",
+    "course_code": "Chemistry 201",
+    "status": "in_progress",
+    "submission_types": ["online_upload"],
+    "rubric": null,
+    "attachments": []
+  },
+  {
+    "id": 5002,
+    "course_id": 1002,
+    "name": "Essay: Renaissance Art Analysis",
+    "description": "<p>Analyze the influence of Renaissance art on modern artistic movements. Focus on at least three major artists.</p>",
+    "due_at": "2024-03-02T23:59:00Z",
+    "points_possible": 100,
+    "course_name": "Renaissance to Modern",
+    "course_code": "Art History 105",
+    "status": "not_started",
+    "submission_types": ["online_upload"],
+    "rubric": null,
+    "attachments": []
+  },
+  {
+    "id": 5003,
+    "course_id": 1003,
+    "name": "Problem Set 8",
+    "description": "<p>Complete problems 1-20 from Chapter 8: Integration Techniques.</p>",
+    "due_at": "2024-02-27T23:59:00Z",
+    "points_possible": 40,
+    "course_name": "Integral Calculus",
+    "course_code": "Calculus II",
+    "status": "missing",
+    "submission_types": ["online_upload"],
+    "rubric": null,
+    "attachments": []
+  },
+  {
+    "id": 5004,
+    "course_id": 1002,
+    "name": "Persuasive Essay: Climate Change Policy",
+    "description": "<p>Write a persuasive essay arguing for or against specific climate change policies. Must use MLA format with Works Cited page.</p>",
+    "due_at": "2024-03-15T23:59:00Z",
+    "points_possible": 100,
+    "course_name": "Renaissance to Modern",
+    "course_code": "Art History 105",
+    "status": "in_progress",
+    "submission_types": ["online_upload", "online_text_entry"],
+    "requirements": [
+      "1,200-1,500 words",
+      "MLA format with Works Cited",
+      "Minimum 5 scholarly sources",
+      "Include counterargument section"
+    ],
+    "rubric": [
+      {
+        "id": "r1",
+        "description": "Thesis Statement",
+        "points": 20,
+        "long_description": "Clear, arguable thesis that presents a specific position on climate change policy. Thesis should be debatable, narrow enough to support, and stated prominently in introduction."
+      },
+      {
+        "id": "r2",
+        "description": "Evidence & Support",
+        "points": 30,
+        "long_description": "Uses at least 5 credible scholarly sources. Evidence is relevant, well-integrated, and effectively supports the thesis. Includes data, statistics, and expert opinions."
+      },
+      {
+        "id": "r3",
+        "description": "Organization",
+        "points": 20,
+        "long_description": "Logical progression from introduction through supporting arguments to conclusion. Clear topic sentences, smooth transitions, and cohesive paragraph structure."
+      },
+      {
+        "id": "r4",
+        "description": "Writing Quality",
+        "points": 20,
+        "long_description": "Clear, precise, and engaging prose. Appropriate academic tone. Varied sentence structure. Minimal grammatical and mechanical errors."
+      },
+      {
+        "id": "r5",
+        "description": "Citations",
+        "points": 10,
+        "long_description": "Correct MLA in-text citations and Works Cited page. All sources properly attributed. No plagiarism."
+      }
+    ],
+    "attachments": [
+      { "id": "a1", "display_name": "essay_guidelines.pdf", "url": "#" },
+      { "id": "a2", "display_name": "sample_outline.docx", "url": "#" }
+    ],
+    "related_module": "Module 4 - Argumentative Writing"
+  }
+]

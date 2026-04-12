@@ -1,0 +1,7 @@
+{
+  "summary": "Today's key updates: Chemistry lab has been moved to Thursday due to equipment maintenance. Art History professor shared additional Renaissance resources in the course files. Calculus office hours extended to 6 PM on Wednesdays.",
+  "action_items": [
+    { "text": "Check updated lab schedule in Chemistry 201", "course": "Chemistry 201" },
+    { "text": "Download Renaissance study materials from Art History", "course": "Art History" }
+  ]
+}

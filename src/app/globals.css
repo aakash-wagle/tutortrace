@@ -1,0 +1,358 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* StudyHub - Neo-Brutalism Design System */
+/* Powered by Penny's design language */
+
+@layer base {
+  :root {
+    /* Classic Penguin - Soft & Professional */
+    --background: oklch(0.98 0.005 264);
+    --foreground: oklch(0.25 0.01 264);
+
+    --card: oklch(0.98 0.005 264);
+    --card-foreground: oklch(0.25 0.01 264);
+
+    --popover: oklch(0.98 0.005 264);
+    --popover-foreground: oklch(0.25 0.01 264);
+
+    /* Primary - Slate Blue */
+    --primary: oklch(0.45 0.02 264);
+    --primary-foreground: oklch(0.98 0.005 264);
+
+    /* Secondary - Warm Gold */
+    --secondary: oklch(0.72 0.15 65);
+    --secondary-foreground: oklch(0.25 0.01 264);
+
+    /* Tertiary - Orange Accent */
+    --tertiary: oklch(0.68 0.18 45);
+    --tertiary-foreground: oklch(0.98 0.005 264);
+
+    /* Accent - Orange */
+    --accent: oklch(0.68 0.18 45);
+    --accent-foreground: oklch(0.98 0.005 264);
+
+    /* Muted tones */
+    --muted: oklch(0.94 0.01 264);
+    --muted-foreground: oklch(0.50 0.01 264);
+
+    /* Success - Fresh green */
+    --success: oklch(0.73 0.25 142.50);
+    --success-foreground: oklch(0.25 0.01 264);
+
+    /* Warning - Warm yellow */
+    --warning: oklch(0.72 0.15 65);
+    --warning-foreground: oklch(0.25 0.01 264);
+
+    /* Destructive */
+    --destructive: oklch(0.55 0.20 25);
+    --destructive-foreground: oklch(0.98 0.005 264);
+
+    /* Borders - Dark slate for neo-brutalism */
+    --border: oklch(0.25 0.01 264);
+    --input: oklch(0.25 0.01 264);
+    --ring: oklch(0.45 0.02 264);
+
+    /* Chart colors */
+    --chart-1: oklch(0.45 0.02 264);
+    --chart-2: oklch(0.72 0.15 65);
+    --chart-3: oklch(0.68 0.18 45);
+    --chart-4: oklch(0.55 0.12 200);
+    --chart-5: oklch(0.60 0.15 85);
+
+    --radius: 0px;
+
+    /* Neo-brutalism shadows */
+    --shadow-2xs: 4px 4px 0px 0px oklch(0.00 0 0 / 0.50);
+    --shadow-xs: 4px 4px 0px 0px oklch(0.00 0 0 / 0.50);
+    --shadow-sm: 4px 4px 0px 0px oklch(0.00 0 0 / 1.00), 4px 1px 2px -1px oklch(0.00 0 0 / 1.00);
+    --shadow: 4px 4px 0px 0px oklch(0.00 0 0 / 1.00), 4px 1px 2px -1px oklch(0.00 0 0 / 1.00);
+    --shadow-md: 4px 4px 0px 0px oklch(0.00 0 0 / 1.00), 4px 2px 4px -1px oklch(0.00 0 0 / 1.00);
+    --shadow-lg: 4px 4px 0px 0px oklch(0.00 0 0 / 1.00), 4px 4px 6px -1px oklch(0.00 0 0 / 1.00);
+    --shadow-xl: 4px 4px 0px 0px oklch(0.00 0 0 / 1.00), 4px 8px 10px -1px oklch(0.00 0 0 / 1.00);
+    --shadow-2xl: 4px 4px 0px 0px oklch(0.00 0 0 / 2.50);
+
+    /* Sidebar */
+    --sidebar-background: oklch(0.94 0.01 264);
+    --sidebar-foreground: oklch(0.25 0.01 264);
+    --sidebar-primary: oklch(0.45 0.02 264);
+    --sidebar-primary-foreground: oklch(0.98 0.005 264);
+    --sidebar-accent: oklch(0.68 0.18 45);
+    --sidebar-accent-foreground: oklch(0.98 0.005 264);
+    --sidebar-border: oklch(0.25 0.01 264);
+    --sidebar-ring: oklch(0.45 0.02 264);
+  }
+
+  .dark {
+    --background: oklch(0.20 0.01 264);
+    --foreground: oklch(0.95 0.01 264);
+
+    --card: oklch(0.25 0.01 264);
+    --card-foreground: oklch(0.95 0.01 264);
+
+    --popover: oklch(0.25 0.01 264);
+    --popover-foreground: oklch(0.95 0.01 264);
+
+    --primary: oklch(0.65 0.12 65);
+    --primary-foreground: oklch(0.20 0.01 264);
+
+    --secondary: oklch(0.72 0.15 65);
+    --secondary-foreground: oklch(0.20 0.01 264);
+
+    --tertiary: oklch(0.68 0.18 45);
+    --tertiary-foreground: oklch(0.20 0.01 264);
+
+    --muted: oklch(0.30 0.01 264);
+    --muted-foreground: oklch(0.75 0.01 264);
+
+    --accent: oklch(0.68 0.18 45);
+    --accent-foreground: oklch(0.20 0.01 264);
+
+    --success: oklch(0.74 0.23 142.87);
+    --success-foreground: oklch(0.20 0.01 264);
+
+    --warning: oklch(0.72 0.15 65);
+    --warning-foreground: oklch(0.20 0.01 264);
+
+    --destructive: oklch(0.65 0.20 25);
+    --destructive-foreground: oklch(0.20 0.01 264);
+
+    --border: oklch(0.95 0.01 264);
+    --input: oklch(0.95 0.01 264);
+    --ring: oklch(0.65 0.12 65);
+
+    --chart-1: oklch(0.65 0.12 65);
+    --chart-2: oklch(0.72 0.15 65);
+    --chart-3: oklch(0.68 0.18 45);
+    --chart-4: oklch(0.60 0.12 200);
+    --chart-5: oklch(0.65 0.15 85);
+
+    --sidebar-background: oklch(0.20 0.01 264);
+    --sidebar-foreground: oklch(0.95 0.01 264);
+    --sidebar-primary: oklch(0.65 0.12 65);
+    --sidebar-primary-foreground: oklch(0.20 0.01 264);
+    --sidebar-accent: oklch(0.68 0.18 45);
+    --sidebar-accent-foreground: oklch(0.20 0.01 264);
+    --sidebar-border: oklch(0.95 0.01 264);
+    --sidebar-ring: oklch(0.65 0.12 65);
+
+    --shadow-2xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
+    --shadow-xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 1px 2px -1px oklch(0.00 0 0 / 0.10);
+    --shadow: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 1px 2px -1px oklch(0.00 0 0 / 0.10);
+    --shadow-md: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 2px 4px -1px oklch(0.00 0 0 / 0.10);
+    --shadow-lg: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 4px 6px -1px oklch(0.00 0 0 / 0.10);
+    --shadow-xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 8px 10px -1px oklch(0.00 0 0 / 0.10);
+    --shadow-2xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.25);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Sans', sans-serif;
+    @apply font-bold tracking-tight;
+  }
+
+  code, pre {
+    font-family: 'Space Mono', monospace;
+  }
+}
+
+@layer components {
+  /* Neo-brutalism card */
+  .brutal-card {
+    @apply bg-card border-2 border-border p-6;
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+  }
+
+  .brutal-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translate(-2px, -2px);
+  }
+
+  /* Neo-brutalism button */
+  .brutal-btn {
+    @apply font-bold border-2 border-border px-6 py-3;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.15s ease;
+  }
+
+  .brutal-btn:hover {
+    box-shadow: var(--shadow);
+    transform: translate(-2px, -2px);
+  }
+
+  .brutal-btn:active {
+    box-shadow: none;
+    transform: translate(2px, 2px);
+  }
+
+  .brutal-btn-primary {
+    @apply brutal-btn bg-primary text-primary-foreground;
+  }
+
+  .brutal-btn-secondary {
+    @apply brutal-btn bg-secondary text-secondary-foreground;
+  }
+
+  .brutal-btn-accent {
+    @apply brutal-btn bg-accent text-accent-foreground;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Progress ring */
+  .progress-ring {
+    transform: rotate(-90deg);
+  }
+
+  .progress-ring-circle {
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Interactive card hover */
+  .interactive-card {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .interactive-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Input neo-brutalism style */
+  .brutal-input {
+    @apply border-2 border-border bg-background px-4 py-3 font-medium;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .brutal-input:focus {
+    @apply outline-none ring-2 ring-primary;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Badge neo-brutalism */
+  .brutal-badge {
+    @apply inline-flex items-center px-3 py-1 text-xs font-bold border-2 border-border;
+    box-shadow: 2px 2px 0px 0px oklch(0 0 0);
+  }
+}
+
+@layer utilities {
+  /* Custom shadows */
+  .shadow-brutal {
+    box-shadow: var(--shadow);
+  }
+
+  .shadow-brutal-lg {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .shadow-brutal-xl {
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Smooth page transitions */
+  .page-enter {
+    animation: pageEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+}
+
+/* Keyframe animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pennyBob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.8); }
+  60% { transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes dialogEnter {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes dialogExit {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes overlayEnter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes overlayExit {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Animation classes */
+.penny-bob { animation: pennyBob 2.5s ease-in-out infinite; }
+.shimmer {
+  background: linear-gradient(90deg, var(--muted) 25%, var(--secondary) 50%, var(--muted) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.count-animate { animation: countUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.slide-in-right { animation: slideInFromRight 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.progress-animate { animation: progressFill 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.float-animation { animation: float 6s ease-in-out infinite; }
+.pop-in { animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* Dialog/Modal animations */
+[data-state="open"] .dialog-content { animation: dialogEnter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+[data-state="closed"] .dialog-content { animation: dialogExit 0.2s ease-out; }
+[data-state="open"] .dialog-overlay { animation: overlayEnter 0.2s ease-out; }
+[data-state="closed"] .dialog-overlay { animation: overlayExit 0.15s ease-out; }

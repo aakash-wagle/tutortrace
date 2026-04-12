@@ -1,0 +1,73 @@
+{
+  "1001": [
+    { "id": 101, "name": "Module 1: Introduction to Chemistry", "items": [
+      { "id": 1011, "title": "Chemical Bonds Overview", "type": "Page" },
+      { "id": 1012, "title": "Lab Safety Guidelines", "type": "Page" },
+      { "id": 1013, "title": "Assignment: Periodic Table Quiz", "type": "Assignment" }
+    ]},
+    { "id": 102, "name": "Module 2: Reactions & Equilibrium", "items": [
+      { "id": 1021, "title": "Types of Chemical Reactions", "type": "Page" },
+      { "id": 1022, "title": "Equilibrium Constants", "type": "Page" },
+      { "id": 1023, "title": "Lab Report: Chemical Reactions", "type": "Assignment" }
+    ]}
+  ],
+  "1002": [
+    { "id": 201, "name": "Module 1: Early Renaissance", "items": [
+      { "id": 2011, "title": "The Birth of Renaissance Art", "type": "Page" },
+      { "id": 2012, "title": "Key Artists: Da Vinci, Michelangelo", "type": "Page" }
+    ]},
+    { "id": 202, "name": "Module 2: High Renaissance", "items": [
+      { "id": 2021, "title": "Raphael and the Roman School", "type": "Page" },
+      { "id": 2022, "title": "Renaissance Architecture", "type": "Page" }
+    ]},
+    { "id": 203, "name": "Module 3: Baroque & Beyond", "items": [
+      { "id": 2031, "title": "Transition to Baroque", "type": "Page" },
+      { "id": 2032, "title": "Caravaggio and Light", "type": "Page" }
+    ]},
+    { "id": 204, "name": "Module 4 - Argumentative Writing", "items": [
+      { "id": 2041, "title": "Persuasive Essay Guidelines", "type": "Page" },
+      { "id": 2042, "title": "Climate Change Policy Sources", "type": "Page" }
+    ]}
+  ],
+  "1003": [
+    { "id": 301, "name": "Module 1: Integration Techniques", "items": [
+      { "id": 3011, "title": "Integration by Parts", "type": "Page" },
+      { "id": 3012, "title": "Trigonometric Substitution", "type": "Page" }
+    ]},
+    { "id": 302, "name": "Module 2: Applications of Integration", "items": [
+      { "id": 3021, "title": "Area Between Curves", "type": "Page" },
+      { "id": 3022, "title": "Volume of Revolution", "type": "Page" }
+    ]}
+  ],
+  "1004": [
+    { "id": 401, "name": "Module 1: Cell Structure", "items": [
+      { "id": 4011, "title": "Prokaryotic vs Eukaryotic Cells", "type": "Page" },
+      { "id": 4012, "title": "Cell Membrane Structure", "type": "Page" },
+      { "id": 4013, "title": "Organelles and Their Functions", "type": "Page" }
+    ]},
+    { "id": 402, "name": "Module 2: Cell Division", "items": [
+      { "id": 4021, "title": "Mitosis and Meiosis", "type": "Page" },
+      { "id": 4022, "title": "Cell Cycle Regulation", "type": "Page" }
+    ]}
+  ],
+  "1005": [
+    { "id": 501, "name": "Module 1: Arrays & Linked Lists", "items": [
+      { "id": 5011, "title": "Array Operations and Complexity", "type": "Page" },
+      { "id": 5012, "title": "Singly and Doubly Linked Lists", "type": "Page" }
+    ]},
+    { "id": 502, "name": "Module 2: Trees & Graphs", "items": [
+      { "id": 5021, "title": "Binary Search Trees", "type": "Page" },
+      { "id": 5022, "title": "Graph Traversal Algorithms", "type": "Page" }
+    ]}
+  ],
+  "1006": [
+    { "id": 601, "name": "Module 1: Perception & Attention", "items": [
+      { "id": 6011, "title": "Visual Perception Theories", "type": "Page" },
+      { "id": 6012, "title": "Selective Attention Models", "type": "Page" }
+    ]},
+    { "id": 602, "name": "Module 2: Memory Systems", "items": [
+      { "id": 6021, "title": "Short-term vs Long-term Memory", "type": "Page" },
+      { "id": 6022, "title": "Encoding and Retrieval Processes", "type": "Page" }
+    ]}
+  ]
+}

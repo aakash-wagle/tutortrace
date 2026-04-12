@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "type": "new_assignment",
+    "title": "New assignment posted",
+    "course_name": "Biology 101",
+    "message": "Chapter 8 Review Questions - Complete questions 1-15 from the textbook",
+    "created_at": "2024-02-27T14:00:00Z",
+    "time_ago": "2 hours ago"
+  },
+  {
+    "id": 2,
+    "type": "due_date_changed",
+    "title": "Due date changed",
+    "course_name": "Computer Science 250",
+    "message": "Project 3 deadline extended to March 5th",
+    "created_at": "2024-02-27T12:00:00Z",
+    "time_ago": "4 hours ago"
+  },
+  {
+    "id": 3,
+    "type": "grade_posted",
+    "title": "Grade posted",
+    "course_name": "Psychology 201",
+    "message": "Midterm Exam - Score: 92/100",
+    "created_at": "2024-02-27T10:00:00Z",
+    "time_ago": "5 hours ago"
+  },
+  {
+    "id": 4,
+    "type": "new_module",
+    "title": "New module available",
+    "course_name": "Physics 110",
+    "message": "Module 9: Thermodynamics and Energy Transfer",
+    "created_at": "2024-02-26T16:00:00Z",
+    "time_ago": "1 day ago"
+  }
+]
