@@ -20,7 +20,11 @@ import {
   ChevronRight,
   Flame,
   BookMarked,
+<<<<<<< HEAD
   ListTodo,
+=======
+  TrendingUp,
+>>>>>>> 4ba5d0c (feat: student performance analytics)
 } from "lucide-react";
 
 export const SIDEBAR_EXPANDED_WIDTH = 240;
@@ -35,6 +39,7 @@ const mainNav = [
   { label: "Weekly Planner", icon: ListTodo, href: "/weekly-planner" },
   { label: "Calendar", icon: CalendarDays, href: "/calendar" },
   { label: "Grades", icon: BarChart2, href: "/grades" },
+  { label: "Analytics", icon: TrendingUp, href: "/analytics" },
   { label: "Messages", icon: MessageSquare, href: "/messages" },
   { label: "Accountability", icon: Target, href: "/accountability" },
   { label: "Achievements", icon: Trophy, href: "/achievements" },

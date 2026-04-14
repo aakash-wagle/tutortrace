@@ -23,7 +23,11 @@ const MyCoursesPage = lazy(() => import("@/pages/MyCourses"));
 const CreateCoursePage = lazy(() => import("@/pages/CreateCoursePage"));
 const CourseEditorPage = lazy(() => import("@/pages/CourseEditorPage"));
 const CourseLearnPage = lazy(() => import("@/pages/CourseLearnPage"));
+<<<<<<< HEAD
 const WeekPlannerPage = lazy(() => import("@/pages/WeekPlanner"));
+=======
+const PerformanceAnalyticsPage = lazy(() => import("@/pages/PerformanceAnalyticsPage"));
+>>>>>>> 4ba5d0c (feat: student performance analytics)
 
 function PageLoader() {
   return (
@@ -86,7 +90,11 @@ export const routes: RouteObject[] = [
       { path: "/my-courses/create", element: <CreateCoursePage /> },
       { path: "/my-courses/:courseId", element: <CourseEditorPage /> },
       { path: "/my-courses/:courseId/learn", element: <CourseLearnPage /> },
+<<<<<<< HEAD
       { path: "/weekly-planner", element: <WeekPlannerPage /> },
+=======
+      { path: "/analytics", element: <PerformanceAnalyticsPage /> },
+>>>>>>> 4ba5d0c (feat: student performance analytics)
     ],
   },
 ];

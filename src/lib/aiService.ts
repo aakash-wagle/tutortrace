@@ -798,6 +798,124 @@ Respond ONLY with valid JSON (no markdown fences) matching this exact shape:
   }
 }
 
+// ── Performance Analytics LLM functions ──────────────────────────────────────
+// These functions accept pre-built strings to avoid circular imports with
+// performanceAnalytics.ts. The caller is responsible for building the transcript.
+
+import type { QuizInsights, StudyPlanFromGrades } from "@/types/performanceAnalytics";
+
+const INSIGHTS_SCHEMA_HINT = `Return a single JSON object with keys:
+- overview: string (2-4 sentences)
+- weak_areas: array of { "topic": string, "evidence": string }
+- strong_areas: array of { "topic": string, "evidence": string }
+- study_recommendations: array of strings
+No markdown fences, only raw JSON.`;
+
+const STUDY_PLAN_SCHEMA_HINT = `Return a single JSON object with keys:
+- compare_to_class: string (2-5 sentences)
+- path_to_grade: string (motivating paragraph)
+- study_next: array of strings (5-10 specific topics or actions)
+No markdown fences, only raw JSON.`;
+
+/**
+ * Generates quiz performance insights from a pre-built question transcript.
+ * Transcript should be built with buildQuestionTranscript() from performanceAnalytics.ts.
+ */
+export async function generateQuizInsights(
+  courseId: string,
+  studentId: string,
+  transcript: string
+): Promise<QuizInsights> {
+  const userContent = [
+    `Course ID: ${courseId}`,
+    `Student ID: ${studentId}`,
+    "You are an expert tutor. Infer conceptual strengths and weaknesses only from the quiz stems, correctness, points, and student responses below.",
+    INSIGHTS_SCHEMA_HINT,
+    "",
+    "Quiz data:",
+    transcript,
+  ].join("\n");
+
+  const text = await completion(
+    [
+      {
+        role: "system",
+        content:
+          "You analyze quiz performance and output strict JSON only. Be specific and cite patterns across questions.",
+      },
+      { role: "user", content: userContent },
+    ],
+    undefined,
+    { jsonObjectResponse: true }
+  );
+
+  const parsed = JSON.parse(extractJson(text)) as Record<string, unknown>;
+  const wa = parsed["weak_areas"];
+  const sa = parsed["strong_areas"];
+  const sr = parsed["study_recommendations"];
+  return {
+    overview: String(parsed["overview"] ?? ""),
+    weak_areas: Array.isArray(wa)
+      ? wa.map((x) => ({
+          topic: String((x as Record<string, unknown>)["topic"] ?? ""),
+          evidence: String((x as Record<string, unknown>)["evidence"] ?? ""),
+        }))
+      : [],
+    strong_areas: Array.isArray(sa)
+      ? sa.map((x) => ({
+          topic: String((x as Record<string, unknown>)["topic"] ?? ""),
+          evidence: String((x as Record<string, unknown>)["evidence"] ?? ""),
+        }))
+      : [],
+    study_recommendations: Array.isArray(sr) ? sr.map(String) : [],
+  };
+}
+
+/**
+ * Generates a study roadmap from assignment grade summary text.
+ * gradesSummary should be built with formatGradesSummaryForLlm() from performanceAnalytics.ts.
+ */
+export async function generateStudyPlanFromGrades(
+  courseId: string,
+  studentId: string,
+  gradesSummary: string,
+  quizWeakHint?: string
+): Promise<StudyPlanFromGrades> {
+  const parts = [
+    `Course ID: ${courseId}`,
+    `Student ID: ${studentId}`,
+    "You are an encouraging academic coach. Use only the grade summary below (and optional quiz weak-topic hints). Do not invent class statistics that are not implied by the data.",
+    STUDY_PLAN_SCHEMA_HINT,
+    "",
+    "Assignment / course grade summary:",
+    gradesSummary,
+  ];
+  if (quizWeakHint?.trim()) {
+    parts.push("", "Quiz weak-topic hints (stems/snippets):", quizWeakHint.trim());
+  }
+
+  const text = await completion(
+    [
+      {
+        role: "system",
+        content:
+          "You synthesize course performance into actionable study guidance. Output strict JSON only. Be honest when class comparison data is sparse.",
+      },
+      { role: "user", content: parts.join("\n") },
+    ],
+    undefined,
+    { jsonObjectResponse: true }
+  );
+
+  const parsed = JSON.parse(extractJson(text)) as Record<string, unknown>;
+  const sn = parsed["study_next"];
+  return {
+    compare_to_class: String(parsed["compare_to_class"] ?? ""),
+    path_to_grade: String(parsed["path_to_grade"] ?? ""),
+    study_next: Array.isArray(sn) ? sn.map(String) : [],
+  };
+}
+
 // ── Mock Fallbacks ─────────────────────────────────────────────────────────────
 
 function getMockFlashcards(req: GenerateFlashcardsRequest): FlashcardItem[] {

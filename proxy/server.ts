@@ -57,11 +57,15 @@ app.use("/canvas-proxy", async (req: Request, res: Response) => {
     return;
   }
 
-  // Strip /canvas-proxy prefix to get the raw Canvas path
+  // Strip /canvas-proxy prefix to get the raw Canvas path.
+  // Use req.url (path + raw query string relative to mount point) to preserve
+  // repeated params like include[]=submission&include[]=score_statistics exactly
+  // as sent — Express's req.query parses them as arrays, and rebuilding via
+  // new URLSearchParams(req.query) would join them as "submission,score_statistics"
+  // which Canvas does not understand.
   const canvasPath = req.path; // e.g. /v1/courses
-  const query = Object.keys(req.query).length
-    ? "?" + new URLSearchParams(req.query as Record<string, string>).toString()
-    : "";
+  const rawQueryIdx = req.url.indexOf("?");
+  const query = rawQueryIdx !== -1 ? req.url.slice(rawQueryIdx) : "";
   const canvasUrl = `${CANVAS_BASE_URL}/api${canvasPath}${query}`;
 
   try {
