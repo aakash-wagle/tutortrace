@@ -90,6 +90,85 @@ export async function canvasApiFetchMultiParam(
   });
 }
 
+// ── Paginated Canvas fetch (follows Link rel="next") ─────────────────────────
+
+/**
+ * Fetches all pages from a Canvas API endpoint that uses Link header pagination.
+ * Equivalent to CanvasClient.get_all_pages() in the Python backend.
+ */
+export async function canvasGetAllPages(
+  userId: string,
+  path: string,
+  params?: URLSearchParams
+): Promise<unknown[]> {
+  const results: unknown[] = [];
+  let nextUrl: string | null = null;
+
+  // Build initial URL via proxy
+  const accessToken = await (async () => {
+    const user = await db.users.get(userId);
+    if (!user) throw new Error("User not found in Dexie");
+    return user.accessToken;
+  })();
+
+  const buildProxyUrl = (p: string, ps?: URLSearchParams) => {
+    const url = new URL(`${CANVAS_PROXY_BASE}/canvas-proxy/v1${p}`);
+    if (ps) url.search = ps.toString();
+    return url.toString();
+  };
+
+  let currentUrl = buildProxyUrl(path, params);
+
+  while (currentUrl) {
+    const res = await fetch(currentUrl, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Canvas API error ${res.status} for ${currentUrl}`);
+    }
+
+    const data: unknown = await res.json();
+    if (Array.isArray(data)) {
+      results.push(...data);
+    } else {
+      results.push(data);
+    }
+
+    // Parse Link header for next page
+    nextUrl = null;
+    const linkHeader = res.headers.get("Link");
+    if (linkHeader) {
+      for (const part of linkHeader.split(",")) {
+        const m = part.match(/<([^>]+)>;\s*rel="next"/);
+        if (m) {
+          // Rewrite the canvas URL through our proxy
+          const canvasNext = m[1];
+          try {
+            const parsedNext = new URL(canvasNext);
+            // Replace the canvas base with our proxy base; keep path after /api/v1
+            const apiPath = parsedNext.pathname.replace(/^\/api\/v1/, "");
+            const proxyNext = new URL(
+              `${CANVAS_PROXY_BASE}/canvas-proxy/v1${apiPath}`
+            );
+            proxyNext.search = parsedNext.search;
+            nextUrl = proxyNext.toString();
+          } catch {
+            nextUrl = null;
+          }
+          break;
+        }
+      }
+    }
+    currentUrl = nextUrl ?? "";
+  }
+
+  return results;
+}
+
 // ── Course content helpers ────────────────────────────────────────────────────
 
 export async function fetchCourseModules(

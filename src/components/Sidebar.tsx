@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Flame,
   BookMarked,
+  TrendingUp,
 } from "lucide-react";
 
 export const SIDEBAR_EXPANDED_WIDTH = 240;
@@ -33,6 +34,7 @@ const mainNav = [
   { label: "Flashcards", icon: Layers, href: "/flashcards" },
   { label: "Calendar", icon: CalendarDays, href: "/calendar" },
   { label: "Grades", icon: BarChart2, href: "/grades" },
+  { label: "Analytics", icon: TrendingUp, href: "/analytics" },
   { label: "Messages", icon: MessageSquare, href: "/messages" },
   { label: "Accountability", icon: Target, href: "/accountability" },
   { label: "Achievements", icon: Trophy, href: "/achievements" },
