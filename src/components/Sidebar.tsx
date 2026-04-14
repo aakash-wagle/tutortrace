@@ -20,11 +20,8 @@ import {
   ChevronRight,
   Flame,
   BookMarked,
-<<<<<<< HEAD
   ListTodo,
-=======
   TrendingUp,
->>>>>>> 4ba5d0c (feat: student performance analytics)
 } from "lucide-react";
 
 export const SIDEBAR_EXPANDED_WIDTH = 240;
